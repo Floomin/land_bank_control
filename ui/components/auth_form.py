@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 from core.utils.text_parsers import fix_keyboard_layout
 
 
@@ -10,13 +11,27 @@ def render_login_form():
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
-        st.title("🔐 Вход в систему")
-        st.markdown("Система контроля земельного банка (Land Bank Control System)")
+        # --- БЛОК ДОБАВЛЕНИЯ ЛОГОТИПА ---
+        # Путь к файлу логотипа (предполагаем, что он лежит в корне проекта)
+        logo_path = os.path.join(os.getcwd(), "logo.png")
+
+        # Проверяем, существует ли файл, прежде чем пытаться его отрисовать
+        if os.path.exists(logo_path):
+            # Отрисовываем логотип, растягиваем его по ширине колонки
+            st.image(logo_path, use_container_width=True)
+        else:
+            st.warning(
+                "⚠️ Файл логотипа 'logo.png' не найден в корневой папке проекта. Пожалуйста, добавьте его."
+            )
+        # --------------------------------
+
+        st.title("Вхід в систему")
+        st.markdown("Система контролю земельного банку")
 
         with st.form("login_form"):
-            username = st.text_input("Пользователь")
+            username = st.text_input("Користувач")
             raw_password = st.text_input("Пароль", type="password")
-            submitted = st.form_submit_button("Войти", use_container_width=True)
+            submitted = st.form_submit_button("Увійти", use_container_width=True)
 
             if submitted:
                 fixed_password = fix_keyboard_layout(raw_password)
