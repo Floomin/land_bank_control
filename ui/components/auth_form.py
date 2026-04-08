@@ -18,7 +18,7 @@ def render_login_form():
         # Проверяем, существует ли файл, прежде чем пытаться его отрисовать
         if os.path.exists(logo_path):
             # Отрисовываем логотип, растягиваем его по ширине колонки
-            st.image(logo_path, use_container_width=True)
+            st.image(logo_path, width="stretch")
         else:
             st.warning(
                 "⚠️ Файл логотипа 'logo.png' не найден в корневой папке проекта. Пожалуйста, добавьте его."
@@ -31,11 +31,10 @@ def render_login_form():
         with st.form("login_form"):
             username = st.text_input("Користувач")
             raw_password = st.text_input("Пароль", type="password")
-            submitted = st.form_submit_button("Увійти", use_container_width=True)
+            submitted = st.form_submit_button("Увійти", width="stretch")
 
             if submitted:
                 fixed_password = fix_keyboard_layout(raw_password)
-
                 return username, fixed_password
 
     return None, None

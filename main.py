@@ -2,40 +2,52 @@ import streamlit as st
 from core.auth import authenticate
 from ui.components.auth_form import render_login_form
 
-# Настройка страницы должна быть первым вызовом Streamlit
 st.set_page_config(
     page_title="Land Bank Control",
-    page_icon="🌍",
+    page_icon="logo.png",
     layout="wide",
-    initial_sidebar_state="collapsed",  # Прячем боковое меню до авторизации
+    initial_sidebar_state="collapsed",
 )
 
-# Инициализация состояния сессии
+hide_sidebar_style = """
+    <style>
+        [data-testid="stSidebar"] {
+            display: none;
+        }
+        [data-testid="stSidebarNav"] {
+            display: none;
+        }
+    </style>
+"""
+
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
-if "username" not in st.session_state:
-    st.session_state.username = None
 
-# Роутинг
 if not st.session_state.authenticated:
-    # Если не авторизован - показываем форму
+    st.markdown(hide_sidebar_style, unsafe_allow_html=True)
+
     user_input, pass_input = render_login_form()
 
     if user_input and pass_input:
         if authenticate(user_input, pass_input):
             st.session_state.authenticated = True
-            st.session_state.username = user_input
-            st.rerun()  # Перезапускаем приложение для обновления интерфейса
+            st.rerun()
         else:
             st.error("Неверное имя пользователя или пароль.")
+
 else:
-    # Если авторизован - показываем основной интерфейс
-    st.sidebar.success(f"👤 Вы вошли как: {st.session_state.username}")
+    pages = [
+        st.Page("pages/1_Аудит.py", title="Аудит", icon="📋"),
+        st.Page("pages/2_Результаты.py", title="Результаты", icon="📈"),
+    ]
 
-    if st.sidebar.button("Выйти", use_container_width=True):
-        st.session_state.authenticated = False
-        st.session_state.username = None
-        st.rerun()
+    pg = st.navigation(pages)
 
-    st.title("Добро пожаловать!")
-    st.info("👈 Раскройте боковое меню, чтобы перейти к Аудиту или Результатам.")
+    with st.sidebar:
+        st.write(f"Пользователь: **{st.session_state.get('username', 'admin')}**")
+        # Исправлено: используем width="stretch"
+        if st.button("Выйти", width="stretch"):
+            st.session_state.authenticated = False
+            st.rerun()
+
+    pg.run()
