@@ -4,16 +4,13 @@ import streamlit as st
 def render_group_2(prefix=""):
     # ГРУПА 2: Реквізити договору
     with st.expander("Група 2: Реквізити договору", expanded=True):
+        # 1. Загальні реквізити самого договору
         col1, col2 = st.columns(2)
         with col1:
             st.text_input("Номер договору", key=f"{prefix}contract_number")
             st.text_input("Номер реєстрації оренди", key=f"{prefix}rent_reg_number")
-            st.text_input("ПІБ Орендодавця", key=f"{prefix}landlord_name")
-            st.text_input(
-                "Частка права володіння (напр. 1/3)", key=f"{prefix}ownership_share"
-            )
             st.date_input(
-                "Дата закінчення (**:red[зігдно ДОГОВОРУ!!!]**)",
+                "Дата закінчення (**:red[згідно ДОГОВОРУ!!!]**)",
                 value=None,
                 key=f"{prefix}end_date",
             )
@@ -22,12 +19,6 @@ def render_group_2(prefix=""):
             st.date_input(
                 "Дата реєстрації договору", value=None, key=f"{prefix}reg_date"
             )
-            st.text_input("ІПН (пайовика)", key=f"{prefix}landlord_ipn")
-            # st.text_input("Паспортні дані")
-            st.text_input(
-                "Частка паю (картка земельної ділянки)", key=f"{prefix}part_share"
-            )
-            st.text_input("Частка орендної плати", key=f"{prefix}part_rent")
             st.date_input(
                 "Дата закінчення (Аудит)", value=None, key=f"{prefix}end_date_audit"
             )
@@ -39,3 +30,51 @@ def render_group_2(prefix=""):
             "Місяці", min_value=0, max_value=11, key=f"{prefix}duration_months"
         )
         sc3.number_input("Дні", min_value=0, max_value=30, key=f"{prefix}duration_days")
+
+        st.divider()
+
+        # 2. Реквізити Орендодавців
+        is_multi = st.session_state.get(f"{prefix}is_multilateral", "Ні")
+        count = (
+            st.session_state.get(f"{prefix}party_count", 1) if is_multi == "Так" else 1
+        )
+
+        if count == 1:
+            # СТАНДАРТНИЙ ВИГЛЯД (1 СТОРОНА)
+            st.write("**Дані Орендодавця**")
+            c1, c2 = st.columns(2)
+            with c1:
+                st.text_input("ПІБ Орендодавця", key=f"{prefix}landlord_name")
+                st.text_input(
+                    "Частка права володіння (напр. 1/3)", key=f"{prefix}ownership_share"
+                )
+                st.text_input(
+                    "Частка паю (картка земельної ділянки)", key=f"{prefix}part_share"
+                )
+            with c2:
+                st.text_input("ІПН (пайовика)", key=f"{prefix}landlord_ipn")
+                st.text_input("Частка орендної плати", key=f"{prefix}part_rent")
+        else:
+            # БАГАТОСТОРОННІЙ ВИГЛЯД
+            st.write("**Дані Орендодавців:**")
+            for i in range(1, count + 1):
+                with st.container(border=True):
+                    st.markdown(f"**Сторона {i}**")
+                    c1, c2 = st.columns(2)
+                    with c1:
+                        st.text_input(
+                            "ПІБ Орендодавця", key=f"{prefix}landlord_name_{i}"
+                        )
+                        st.text_input(
+                            "Частка права володіння (напр. 1/3)",
+                            key=f"{prefix}ownership_share_{i}",
+                        )
+                        st.text_input(
+                            "Частка паю (картка земельної ділянки)",
+                            key=f"{prefix}part_share_{i}",
+                        )
+                    with c2:
+                        st.text_input("ІПН (пайовика)", key=f"{prefix}landlord_ipn_{i}")
+                        st.text_input(
+                            "Частка орендної плати", key=f"{prefix}part_rent_{i}"
+                        )

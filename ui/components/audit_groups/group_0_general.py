@@ -25,7 +25,16 @@ def render_group_0():
                 options=load_options("counterparty_types.txt"),
                 key="counterparty_type",
             )
-            st.selectbox(
-                "Багатосторонній", options=["Так", "Ні"], key="is_multilateral"
+            is_multi = st.selectbox(
+                "Багатосторонній", options=["Ні", "Так"], key="is_multilateral"
             )
+            if is_multi == "Так":
+                st.number_input(
+                    "Кількість сторін",
+                    min_value=2,
+                    max_value=20,
+                    value=2,
+                    step=1,
+                    key="party_count",
+                )
             st.text_input("№ папки в Архіві", key="archive_folder_num")

@@ -32,6 +32,8 @@ def render_group_6():
                         st.session_state.agreements.remove(agr_id)
                         st.rerun()
 
+                # Створюємо єдиний префікс для цієї угоди
+                pfx = f"agr_{agr_id}_"
                 # 1. Власні атрибути додаткової угоди
                 c1, c2 = st.columns(2)
                 with c1:
@@ -41,17 +43,26 @@ def render_group_6():
                         key=f"agr_type_{agr_id}",
                     )
                 with c2:
-                    st.selectbox(
+                    is_multi = st.selectbox(
                         "Багатостороння",
-                        options=["Так", "Ні"],
-                        key=f"agr_is_multilateral_{agr_id}",
+                        options=["Ні", "Так"],
+                        key=f"{pfx}is_multilateral",
                     )
-
+                # Додаємо запит кількості сторін саме для цієї дод. угоди!
+                if is_multi == "Так":
+                    st.number_input(
+                        "Кількість сторін",
+                        min_value=2,
+                        max_value=20,
+                        value=2,
+                        step=1,
+                        key=f"{pfx}party_count",
+                    )
                 st.divider()
 
                 # 2. Виклик стандартних груп із передачею префікса
                 # Префікс гарантує, що ключі полів у різних угодах не співпадуть
-                render_group_1(prefix=f"agr1_{agr_id}_")
-                render_group_2(prefix=f"agr2_{agr_id}_")
-                render_group_3(prefix=f"agr3_{agr_id}_")
-                render_group_5(prefix=f"agr5_{agr_id}_")
+                render_group_1(prefix=pfx)
+                render_group_2(prefix=pfx)
+                render_group_3(prefix=pfx)
+                render_group_5(prefix=pfx)
