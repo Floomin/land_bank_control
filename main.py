@@ -22,6 +22,8 @@ hide_sidebar_style = """
 
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+if "username" not in st.session_state:
+    st.session_state.username = None
 
 if not st.session_state.authenticated:
     st.markdown(hide_sidebar_style, unsafe_allow_html=True)
@@ -31,15 +33,23 @@ if not st.session_state.authenticated:
     if user_input and pass_input:
         if authenticate(user_input, pass_input):
             st.session_state.authenticated = True
+            st.session_state.username = user_input
             st.rerun()
         else:
             st.error("Неверное имя пользователя или пароль.")
 
 else:
-    pages = [
-        st.Page("pages/1_Аудит.py", title="Аудит", icon="📋"),
-        st.Page("pages/2_Результаты.py", title="Результаты", icon="📈"),
-    ]
+    # Визначаємо доступні сторінки
+    if st.session_state.get("username") == "admin":
+        pages = [
+            st.Page("pages/1_Аудит.py", title="Аудит", icon="📋"),
+            st.Page("pages/2_Результати.py", title="Результати", icon="📈"),
+        ]
+    else:
+        # Для звичайного аудитора
+        pages = [
+            st.Page("pages/1_Аудит.py", title="Аудит", icon="📋"),
+        ]
 
     pg = st.navigation(pages)
 
