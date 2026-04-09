@@ -7,13 +7,25 @@ def render_group_0():
     with st.expander("Група 0: Загальна інформація", expanded=True):
         col1, col2 = st.columns(2)
         with col1:
-            st.selectbox("Тип договору", options=load_options("contract_types.txt"))
-            st.selectbox("Організація", options=load_options("org_list.txt"))
-            st.selectbox("Населений пункт", options=load_options("vilage.txt"))
+            st.selectbox(
+                "Тип договору",
+                options=load_options("contract_types.txt"),
+                key="contract_type",
+            )
+            st.selectbox(
+                "Організація", options=load_options("org_list.txt"), key="organization"
+            )
+            st.selectbox(
+                "Населений пункт", options=load_options("vilage.txt"), key="settlement"
+            )
 
         with col2:
             st.selectbox(
-                "Тип Контрагенту", options=load_options("counterparty_types.txt")
+                "Тип Контрагенту",
+                options=load_options("counterparty_types.txt"),
+                key="counterparty_type",
             )
-            st.selectbox("Багатосторонній", options=["Так", "Ні"])
-            st.text_input("№ папки в Архіві")
+            st.selectbox(
+                "Багатосторонній", options=["Так", "Ні"], key="is_multilateral"
+            )
+            st.text_input("№ папки в Архіві", key="archive_folder_num")
