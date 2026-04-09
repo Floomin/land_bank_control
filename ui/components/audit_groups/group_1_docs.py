@@ -18,9 +18,3 @@ def render_group_1():
             options=load_options("legal_docs.txt"),
             help="Можна обрати декілька варіантів",
         )
-
-        st.multiselect(
-            "Наявність обов'язкових додатків",
-            options=load_options("annexes.txt"),
-            placeholder="Оберіть за наявності",
-        )

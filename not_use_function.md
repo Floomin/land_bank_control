@@ -28,3 +28,10 @@
         #   st.checkbox("Відповідність підпису Орендаря", value=True)
         # with c7:
         #   st.checkbox("Відповідність підпису Орендодавця", value=True)
+
+
+                st.multiselect(
+            "Наявність обов'язкових додатків",
+            options=load_options("annexes.txt"),
+            placeholder="Оберіть за наявності",
+        )

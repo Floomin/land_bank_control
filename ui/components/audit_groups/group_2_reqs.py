@@ -10,7 +10,7 @@ def render_group_2():
             st.text_input("Номер реєстрації оренди")
             st.text_input("ПІБ Орендодавця")
             st.text_input("Частка права володіння (напр. 1/3)")
-            st.date_input("Дата закінчення (#ff0000 зігдно ДОГОВОРУ!!!)", value=None)
+            st.date_input("Дата закінчення (зігдно ДОГОВОРУ!!!)", value=None)
         with col2:
             st.date_input("Дата підписання", value=None)
             st.date_input("Дата реєстрації договору", value=None)
