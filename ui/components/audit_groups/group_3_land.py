@@ -16,7 +16,7 @@ def render_group_3(prefix=""):
             st.text_input("Місце розташування", key=f"{prefix}location")
             (
                 st.selectbox(
-                    "Цільове призначення",
+                    "Статус земельної ділянки",
                     options=load_options("land_purposes.txt"),
                     key=f"{prefix}purpose",
                 ),
@@ -36,7 +36,7 @@ def render_group_3(prefix=""):
             )
             st.text_input("Місце розташування (ПД)", key=f"{prefix}location_legal")
             st.selectbox(
-                "Цільове призначення (ПД)",
+                "Статус земельної ділянки (ПД)",
                 options=load_options("land_purposes.txt"),
                 key=f"{prefix}purpose_legal",
             )

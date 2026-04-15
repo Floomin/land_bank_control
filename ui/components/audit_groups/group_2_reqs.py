@@ -13,14 +13,26 @@ def render_group_2(prefix=""):
                 "Дата закінчення (**:red[згідно ДОГОВОРУ!!!]**)",
                 value=None,
                 key=f"{prefix}end_date",
+                format="DD/MM/YYYY",
             )
         with col2:
-            st.date_input("Дата підписання", value=None, key=f"{prefix}sign_date")
             st.date_input(
-                "Дата реєстрації договору", value=None, key=f"{prefix}reg_date"
+                "Дата підписання",
+                value=None,
+                key=f"{prefix}sign_date",
+                format="DD/MM/YYYY",
             )
             st.date_input(
-                "Дата закінчення (Аудит)", value=None, key=f"{prefix}end_date_audit"
+                "Дата реєстрації договору",
+                value=None,
+                key=f"{prefix}reg_date",
+                format="DD/MM/YYYY",
+            )
+            st.date_input(
+                "Дата закінчення (Аудит)",
+                value=None,
+                key=f"{prefix}end_date_audit",
+                format="DD/MM/YYYY",
             )
 
         st.write("**Строк дії**")
@@ -78,3 +90,16 @@ def render_group_2(prefix=""):
                         st.text_input(
                             "Частка орендної плати", key=f"{prefix}part_rent_{i}"
                         )
+        # ---  ЗМІНА ВЛАСНИКА ---
+        st.divider()
+        st.write("**Зміна власника**")
+
+        # Визначаємо ключ для чекбокса з урахуванням префікса
+        owner_changed_key = f"{prefix}is_owner_changed"
+
+        # Створюємо чекбокс. Його стан автоматично запишеться в st.session_state
+        st.checkbox("Зміна власника", key=owner_changed_key)
+
+        # Якщо чекбокс активний (True), відображаємо текстове поле
+        if st.session_state.get(owner_changed_key, False):
+            st.text_input("Новий власник (ПІБ / Назва)", key=f"{prefix}new_owner_name")
