@@ -58,6 +58,10 @@ def render_group_6():
                         step=1,
                         key=f"{pfx}party_count",
                     )
+                    st.text_area(
+                        "Примітка Аудитора до дод. угоди",
+                        key=f"agr_{agr_id}_auditor_note",
+                    )
                 st.divider()
 
                 # 2. Виклик стандартних груп із передачею префікса

@@ -38,3 +38,8 @@ def render_group_0():
                     key="party_count",
                 )
             st.text_input("№ папки в Архіві", key="archive_folder_num")
+            st.selectbox(
+                "Вид Договору(облік в 1С)",
+                options=load_options("oblik.txt"),
+                key="oblik_type",
+            )

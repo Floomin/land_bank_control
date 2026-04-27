@@ -5,7 +5,7 @@ from ui.components.audit_groups.group_1_docs import render_group_1
 from ui.components.audit_groups.group_2_reqs import render_group_2
 from ui.components.audit_groups.group_3_land import render_group_3
 from ui.components.audit_groups.group_5_legal import render_group_5
-from ui.components.audit_groups.group_6_agreements import render_group_6
+#from ui.components.audit_groups.group_6_agreements import render_group_6
 
 
 def render_audit_form():
@@ -25,7 +25,7 @@ def render_audit_form():
         key="auditor_note",
     )
     # ГРУПА 6: Додаткові угоди
-    render_group_6()
+    #render_group_6()
 
     # КНОПКИ
     st.divider()

@@ -18,15 +18,15 @@ def render_group_1(prefix=""):
             c1, c2 = st.columns(2)
             with c1:
                 st.checkbox(
-                    "Копія паспорта", value=True, key=f"{prefix}has_passport_copy"
+                    "Копія паспорта (Згідно останього діючого документу)", value=True, key=f"{prefix}has_passport_copy"
                 )
             with c2:
                 st.checkbox(
-                    "Копія ІПН", value=True, help="text", key=f"{prefix}has_ipn_copy"
+                    "Копія ІПН (Згідно останього діючого документу)", value=True, help="text", key=f"{prefix}has_ipn_copy"
                 )
 
             st.multiselect(
-                "Копія правоустановчих документів",
+                "Копія правоустановчих документів (Згідно останього діючого документу)",
                 options=load_options("legal_docs.txt"),
                 help="Можна обрати декілька варіантів",
                 key=f"{prefix}legal_docs_copies",
@@ -40,20 +40,20 @@ def render_group_1(prefix=""):
                     c1, c2 = st.columns(2)
                     with c1:
                         st.checkbox(
-                            "Копія паспорта",
+                            "Копія паспорта (Згідно останього діючого документу)",
                             value=True,
                             key=f"{prefix}has_passport_copy_{i}",
                         )
                     with c2:
                         st.checkbox(
-                            "Копія ІПН",
+                            "Копія ІПН(Згідно останього діючого документу)",
                             value=True,
                             help="text",
                             key=f"{prefix}has_ipn_copy_{i}",
                         )
 
                     st.multiselect(
-                        "Копія правоустановчих документів",
+                        "Копія правоустановчих документів (Згідно останього діючого документу)",
                         options=load_options("legal_docs.txt"),
                         key=f"{prefix}legal_docs_copies_{i}",
                     )
