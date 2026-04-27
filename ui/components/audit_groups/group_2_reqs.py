@@ -2,6 +2,7 @@ import streamlit as st
 import uuid
 from core.utils.data_cleaners import load_options
 
+
 def render_group_2(prefix=""):
     # ГРУПА 2: Реквізити договору
     with st.expander("Група 2: Реквізити договору", expanded=True):
@@ -57,15 +58,22 @@ def render_group_2(prefix=""):
             st.write("**Дані Орендодавця**")
             c1, c2 = st.columns(2)
             with c1:
-                st.text_input("ПІБ Орендодавця (**:red[Згідно останього діючого документа]**)", key=f"{prefix}landlord_name")
                 st.text_input(
-                    "Частка права володіння (напр. 1/3) (**:red[Згідно Право. документа]**)", key=f"{prefix}ownership_share"
+                    "ПІБ Орендодавця (**:red[Згідно останього діючого документа]**)",
+                    key=f"{prefix}landlord_name",
+                )
+                st.text_input(
+                    "Частка права володіння (напр. 1/3) (**:red[Згідно Право. документа]**)",
+                    key=f"{prefix}ownership_share",
                 )
                 st.text_input(
                     "Частка паю (картка земельної ділянки)", key=f"{prefix}part_share"
                 )
             with c2:
-                st.text_input("ІПН (пайовика) (**:red[Згідно останього діючого документа]**)", key=f"{prefix}landlord_ipn")
+                st.text_input(
+                    "ІПН (пайовика) (**:red[Згідно останього діючого документа]**)",
+                    key=f"{prefix}landlord_ipn",
+                )
                 st.text_input("Частка орендної плати", key=f"{prefix}part_rent")
         else:
             # БАГАТОСТОРОННІЙ ВИГЛЯД
@@ -76,7 +84,8 @@ def render_group_2(prefix=""):
                     c1, c2 = st.columns(2)
                     with c1:
                         st.text_input(
-                            "ПІБ Орендодавця (**:red[Згідно останього діючого документа]**)", key=f"{prefix}landlord_name_{i}"
+                            "ПІБ Орендодавця (**:red[Згідно останього діючого документа]**)",
+                            key=f"{prefix}landlord_name_{i}",
                         )
                         st.text_input(
                             "Частка права володіння (напр. 1/3) (**:red[Згідно Право. документа]**)",
@@ -87,14 +96,18 @@ def render_group_2(prefix=""):
                             key=f"{prefix}part_share_{i}",
                         )
                     with c2:
-                        st.text_input("ІПН (пайовика) (**:red[Згідно останього діючого документа]**)", key=f"{prefix}landlord_ipn_{i}")
+                        st.text_input(
+                            "ІПН (пайовика) (**:red[Згідно останього діючого документа]**)",
+                            key=f"{prefix}landlord_ipn_{i}",
+                        )
                         st.text_input(
                             "Частка орендної плати", key=f"{prefix}part_rent_{i}"
                         )
-# --- НОВИЙ БЛОК: СПРОЩЕНІ ДОДАТКОВІ УГОДИ ---
+
+        # --- НОВИЙ БЛОК: СПРОЩЕНІ ДОДАТКОВІ УГОДИ ---
         st.divider()
         st.write("**Додаткові угоди**")
-        
+
         # Використовуємо унікальний ключ для списку угод у session_state
         agreements_key = f"{prefix}simple_agreements"
         if agreements_key not in st.session_state:
@@ -113,7 +126,9 @@ def render_group_2(prefix=""):
                 with col_title:
                     st.markdown(f"**Угода #{idx + 1}**")
                 with col_del:
-                    if st.button("🗑️ Видалити", key=f"{prefix}del_agr_{agr_id}", width="stretch"):
+                    if st.button(
+                        "🗑️ Видалити", key=f"{prefix}del_agr_{agr_id}", width="stretch"
+                    ):
                         st.session_state[agreements_key].remove(agr_id)
                         st.rerun()
 
