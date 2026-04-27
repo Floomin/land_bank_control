@@ -4,7 +4,6 @@ import numpy as np
 import os
 from dotenv import load_dotenv
 
-# Завантажуємо змінні середовища з файлу .env
 load_dotenv()
 
 # ==========================================
@@ -18,7 +17,6 @@ PASSWORD = os.getenv("DB_PASSWORD")
 if not SERVER or not DATABASE:
     raise ValueError("❌ Помилка: Впевніться, що DB_SERVER та DB_NAME вказані у файлі .env")
 
-# Формуємо рядок підключення
 if USER and PASSWORD:
     conn_str = (
         f"DRIVER={{ODBC Driver 17 for SQL Server}};"
@@ -36,20 +34,46 @@ def process_and_load_data():
     print(f"📥 Завантаження файлу: {excel_path} (Лист: 'data')")
     
     try:
-        df = pd.read_excel(excel_path, sheet_name='data')
+        df = pd.read_excel(excel_path, sheet_name='data', dtype=str)
     except Exception as e:
         print(f"❌ Помилка читання Excel файлу: {e}")
         return
     
     df = df.dropna(subset=['Кадастровый номер'])
-    df = df.replace({np.nan: None})
     
+    # ---------------------------------------------------------
+    # БРОНЕБІЙНІ ФУНКЦІЇ ОЧИЩЕННЯ ДАНИХ
+    # ---------------------------------------------------------
+    def clean_val(val):
+        """Універсальна функція для очищення тексту від сміття."""
+        if pd.isna(val) or val is None:
+            return None
+        val_str = str(val).strip()
+        if val_str.lower() in ("", "nan", "none", "null", "<na>", "nat"):
+            return None
+        # Якщо Pandas додав .0 до номера договору чи ІНН, прибираємо його
+        if val_str.endswith('.0'):
+            val_str = val_str[:-2]
+        return val_str
+
     def safe_date(date_val):
-        if pd.isna(date_val) or date_val is None:
+        val = clean_val(date_val)
+        if not val:
             return None
         try:
-            return pd.to_datetime(date_val, dayfirst=True).strftime('%Y-%m-%d')
+            return pd.to_datetime(val, dayfirst=True).strftime('%Y-%m-%d')
         except Exception:
+            return None
+
+    def safe_decimal(val):
+        """Перетворює на число і форматує як рядок з 4 знаками, щоб уникнути помилки масштабу в SQL."""
+        v = clean_val(val)
+        if not v:
+            return None
+        try:
+            f_val = float(v.replace(',', '.'))
+            return f"{f_val:.4f}"
+        except ValueError:
             return None
 
     print("⚙️ Підключення до бази даних...")
@@ -57,7 +81,6 @@ def process_and_load_data():
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
         
-        # SQL-запит (тепер 24 параметри, вилучено term_agr_detailed_1c)
         insert_query = """
         IF NOT EXISTS (SELECT 1 FROM System1C_Contracts WHERE cadastral_number = ?)
         BEGIN
@@ -80,42 +103,43 @@ def process_and_load_data():
 
         print("🚀 Початок імпорту...")
         for index, row in df.iterrows():
-            cadastral_number = str(row['Кадастровый номер']).strip()
+            cadastral_number = clean_val(row['Кадастровый номер'])
+            if not cadastral_number:
+                continue
+                
+            # Очищуємо ключі словника від пробілів
+            row_dict = {str(k).strip(): v for k, v in row.items()}
             
-            # --- ОБРОБКА БАГАТОСТОРОННЬОГО ДОГОВОРУ ---
-            multi_raw = row.get('Багатосторонній договір')
-            if multi_raw is not None and str(multi_raw).strip() != "":
-                is_multi_str = "Так"
-            else:
-                is_multi_str = "Ні"
+            # Обробка багатостороннього договору
+            multi_raw = clean_val(row_dict.get('Багатосторонній договір'))
+            is_multi_str = "Так" if multi_raw else "Ні"
             
-            # Підготовка значень для вставки (24 параметри)
+            # Всі поля пропускаємо через clean_val, safe_date або safe_decimal
             values = (
                 cadastral_number,                                         # 1
-                row.get('Місцезнаходження оригіналів ДАЗ (договір)'),     # 2
-                row.get('Главная организация'),                           # 3
-                row.get('Село'),                                          # 4
-                row.get('Площадь'),                                       # 5
-                row.get('Статус земельного участка'),                     # 6
-                is_multi_str,                                             # 7 (Оброблене "Так"/"Ні")
-                row.get('Номер'),                                         # 8
-                safe_date(row.get('Дата')),                               # 9
-                row.get('Термін із документа договір'),                   # 10
-                safe_date(row.get('Дата окончания действия')),            # 11
-                row.get('Вид договора'),                                  # 12
-                row.get('Вид арендодателя'),                              # 13
-                row.get('№ дод. угоди'),                                  # 14
-                safe_date(row.get('Дата дод. угоди')),                    # 15
-                row.get('Термін дод. угоди від дати основного договору'), # 16
-                safe_date(row.get('Дата закінчення дод. угоди')),         # 17
-                row.get('Вид додаткової угоди'),                          # 18
-                # ВИЛУЧЕНО: Термін дод. угоди (років, міс.,днів)
-                row.get('Контрагент'),                                    # 19
-                str(row.get('ИНН')) if pd.notna(row.get('ИНН')) else None,# 20
-                row.get('Кво. паев'),                                     # 21
-                safe_date(row.get('Дата регистрации договора')),          # 22
-                row.get('Регистрационный номер'),                         # 23
-                row.get('Состояние')                                      # 24
+                clean_val(row_dict.get('Місцезнаходження оригіналів ДАЗ (договір)')), # 2
+                clean_val(row_dict.get('Главная организация')),           # 3
+                clean_val(row_dict.get('Село')),                          # 4
+                safe_decimal(row_dict.get('Площадь')),                    # 5 (Ідеально відформатовано)
+                clean_val(row_dict.get('Статус земельного участка')),     # 6
+                is_multi_str,                                             # 7
+                clean_val(row_dict.get('Номер')),                         # 8
+                safe_date(row_dict.get('Дата')),                          # 9
+                safe_decimal(row_dict.get('Термін із документа договір')),# 10
+                safe_date(row_dict.get('Дата окончания действия')),       # 11
+                clean_val(row_dict.get('Вид договора')),                  # 12
+                clean_val(row_dict.get('Вид арендодателя')),              # 13
+                clean_val(row_dict.get('№ дод. угоди')),                  # 14
+                safe_date(row_dict.get('Дата дод. угоди')),               # 15
+                safe_decimal(row_dict.get('Термін дод. угоди від дати основного договору')), # 16
+                safe_date(row_dict.get('Дата закінчення дод. угоди')),    # 17
+                clean_val(row_dict.get('Вид додаткової угоди')),          # 18
+                clean_val(row_dict.get('Контрагент')),                    # 19
+                clean_val(row_dict.get('ИНН')),                           # 20 (Без зайвих .0)
+                clean_val(row_dict.get('Кво. паев')),                     # 21
+                safe_date(row_dict.get('Дата регистрации договору')) or safe_date(row_dict.get('Дата регистрации договора')), # 22
+                clean_val(row_dict.get('Регистрационный номер')) or clean_val(row_dict.get('№ реєстрації')) or clean_val(row_dict.get('Реєстраційний номер')), # 23
+                clean_val(row_dict.get('Состояние'))                      # 24
             )
             
             cursor.execute(insert_query, (cadastral_number, *values))
